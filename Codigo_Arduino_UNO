@@ -1,114 +1,116 @@
 #include <LiquidCrystal_I2C.h>
-int Vo;
+int Vo; 
 int V1;
 int V2;
 int V3;
 float R2, tKelvin, tCelsius, tKelvin1, tCelsius1, tKelvin2, tCelsius2, tKelvin3, tCelsius3;
-
 const float Beta= 3974.0;
-const float Temp_amb =298.15;
-const float Ro = 10000.0;
-const float R1 =10000.0;
+const float Temp_amb =298.15;  
+const float Ro = 10000.0; 
+const float R1 =10000.0;  
 const float setpoint = 24.0;
 const float histeresis = 2.0;
-
 LiquidCrystal_I2C lcd(0x27,16, 2);
 
 void setup() {
- Serial.begin(9600);
- pinMode(3,OUTPUT);
- pinMode(4,OUTPUT);
- lcd.init();
- lcd.backlight();
- lcd.setCursor(0,0);
- lcd.print("T_promedio: ");
- lcd.setCursor(8,0);
- lcd.print("Presion:");
+  Serial.begin(9600);
+  pinMode(3,OUTPUT);  
+  pinMode(4,OUTPUT);
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print("T_promedio: ");
+  lcd.setCursor(8,0);
+  lcd.print("Presion:");
 }
 
 void loop() {
- Vo = analogRead(A0);
- R2 = R1 * (1023.0/ (float)Vo- 1.0);
-    (Beta +(Temp_amb * log(R2 / Ro)));
-    tKelvin = (Beta * Temp_amb) /
-    (Beta +(Temp_amb * log(R2 / Ro)));
- tCelsius = tKelvin - 273.15;
+  Vo = analogRead(A0);
+  R2 = R1 * (1023.0/ (float)Vo- 1.0); 
+            (Beta +(Temp_amb * log(R2 / Ro)));
+            tKelvin = (Beta * Temp_amb) /
+            (Beta +(Temp_amb * log(R2 / Ro)));
+  tCelsius = tKelvin - 273.15;
 
- V1 = analogRead(A1);
- R2 = R1 * (1023.0 / (float)V1 -1.0);
- tKelvin1 = (Beta * Temp_amb) /
-    (Beta +(Temp_amb * log(R2 / Ro)));
- tCelsius1 = tKelvin1 - 273.15;
+  V1 = analogRead(A1);
+  R2 = R1 * (1023.0 / (float)V1 -1.0);
+  tKelvin1 = (Beta * Temp_amb) /
+            (Beta +(Temp_amb * log(R2 / Ro)));
+  tCelsius1 = tKelvin1 - 273.15;
 
- V2 = analogRead(A2);
- R2 = R1 * (1023.0 / (float)V2 - 1.0);
- tKelvin2 = (Beta * Temp_amb) /
-    (Beta +(Temp_amb * log(R2 / Ro)));
- tCelsius2 = tKelvin2 - 273.15;
+  V2 = analogRead(A2);
+  R2 = R1 * (1023.0 / (float)V2 - 1.0);
+  tKelvin2 = (Beta * Temp_amb) /
+            (Beta +(Temp_amb * log(R2 / Ro)));
+  tCelsius2 = tKelvin2 - 273.15;
 
- V3 = analogRead(A3);
- R2 = R1 * (1023.0 / (float)V3 - 1.0);
- tKelvin3 = (Beta * Temp_amb) /
-    (Beta +(Temp_amb * log(R2 / Ro)));
- tCelsius3 = tKelvin3 - 273.15;
+  V3 = analogRead(A3);
+  R2 = R1 * (1023.0 / (float)V3 - 1.0);
+  tKelvin3 = (Beta * Temp_amb) /
+            (Beta +(Temp_amb * log(R2 / Ro)));
+  tCelsius3 = tKelvin3 - 273.15;
 
- float promedio = (tCelsius+tCelsius1+tCelsius2+tCelsius3)/4;
- Serial.print("Temperature 1: ");
- Serial.print(tCelsius);
- Serial.println(" C");
- delay(1000);
+  float promedio = (tCelsius+tCelsius1+tCelsius2+tCelsius3)/4;
 
- Serial.print("Temperature 2: ");
- Serial.print(tCelsius1);
- Serial.println(" C");
- delay(1000);
+  Serial.print("Temperature 1: ");
+  Serial.print(tCelsius);
+  Serial.println(" C");
+  delay(1000);
 
- Serial.print("Temperature 3: ");
- Serial.print(tCelsius2);
- Serial.println(" C");
- delay(1000);
+  Serial.print("Temperature 2: ");
+  Serial.print(tCelsius1);
+  Serial.println(" C");
+  delay(1000);
 
- Serial.print("Temperature 4: ");
- Serial.print(tCelsius3);
- Serial.println(" C");
- delay(1000);
+  Serial.print("Temperature 3: ");
+  Serial.print(tCelsius2);
+  Serial.println(" C");
+  delay(1000);
 
- Serial.print("Promedio: ");
- Serial.print(promedio);
- Serial.println(" C");
- delay(1000);
+  Serial.print("Temperature 4: ");
+  Serial.print(tCelsius3);
+  Serial.println(" C");
+  delay(1000);
 
- String listaValores = "a"+String(tCelsius)+ String(tCelsius1)+
- String(tCelsius2) + String(tCelsius3);
- Serial.println("Datos enviados: ");
- Serial.println(listaValores); // Imprime la lista completa
- delay(1500);
+  Serial.print("Promedio: ");
+  Serial.print(promedio);
+  Serial.println(" C");
+  delay(1000);
 
- if (promedio > setpoint+histeresis) {
-  digitalWrite(3,HIGH);
-  digitalWrite(4,HIGH);
+  String listaValores = "a"+String(tCelsius)+ String(tCelsius1)+
+                        String(tCelsius2) + String(tCelsius3);
+
+  Serial.println("Datos enviados: ");
+  Serial.println(listaValores); // Imprime la lista completa
+  delay(1500);
+
+  if (promedio > setpoint+histeresis) {
+    digitalWrite(3,HIGH);
+    digitalWrite(4,HIGH);
   } else if (promedio < setpoint-histeresis) {
-  digitalWrite(3,LOW);
-  digitalWrite(4,LOW);
+    digitalWrite(3,LOW);
+    digitalWrite(4,LOW);
   }
- if (promedio<setpoint){
- digitalWrite(3,LOW);
- }
- if (promedio>setpoint+histeresis/2){
- digitalWrite(3,HIGH);
- }
+  if (promedio<setpoint){
+    digitalWrite(3,LOW);
+  }
+  if (promedio>setpoint+histeresis/2){
+    digitalWrite(3,HIGH);
+  }
+  lcd.setCursor(0,0);
+  lcd.print("T_promedio: ");
+  lcd.setCursor(0,1);
+  lcd.print(promedio);
+  lcd.print(" C");
+  lcd.setCursor(8,0);
+  lcd.print("Presion:");
  
- lcd.setCursor(0,0);
- lcd.print("T_promedio: ");
- lcd.setCursor(0,1);
- lcd.print(promedio);
- lcd.print(" C");
- lcd.setCursor(8,0);
- lcd.print("Presion:");
- float valorpresion=analogRead(A5);
- float presion_map=map(valorpresion,0,1023,0,10);
- Serial.print("Presin: ");
- Serial.println(presion_map);
- lcd.setCursor(9,1);
- lcd.print(presion_map);
+  
+  float valorpresion=analogRead(A5);
+  float presion_map=map(valorpresion,0,1023,0,10);
+  Serial.print("Presión: ");
+  Serial.println(presion_map);
+  lcd.setCursor(9,1);
+  lcd.print(presion_map);
+
 }
