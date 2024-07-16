@@ -1,0 +1,103 @@
+#define RXp2 16
+#define TXp2 17
+#include <WiFi.h>
+#include <ThingSpeak.h>
+
+String datos;
+float temperatura1, temperatura2, temperatura3, temperatura4;
+
+p
+char ssid[] = "Insertar aqui nombre de internet";   
+char pass[] = "insertar aqui contraseña";   
+int keyIndex = 0;            
+WiFiClient  client;
+
+unsigned long myChannelNumber = 2456188;
+const char * myWriteAPIKey = "4R3PT5JALDF7ZDJ6";
+
+
+
+void setup() {
+  Serial.begin(115200);
+  Serial2.begin(9600, SERIAL_8N1, RXp2, TXp2);
+
+  WiFi.mode(WIFI_STA); 
+  ThingSpeak.begin(client);
+
+}
+
+void loop() {
+    // Connect or reconnect to WiFi
+  if(WiFi.status() != WL_CONNECTED){
+    Serial.print("Intentando conectarse a la red: ");
+    Serial.println(ssid);
+    while(WiFi.status() != WL_CONNECTED){
+      WiFi.begin(ssid, pass);  
+      Serial.print(".");
+      delay(5000);     
+    } 
+    Serial.println("\nConectado.");
+  }
+
+  if (Serial2.available()) { // Comprueba si hay datos disponibles para leer
+    datos = Serial2.readString(); // Lee la cadena hasta el carácter de nueva línea
+    Serial.println("Mensaje Recibido:");
+    Serial.println(datos);
+
+    //Serial.println(datos.length());
+    // Verifica la longitud de la cadena y el primer carácter
+
+    if (datos.length() == 23) {
+
+      temperatura1 = datos.substring(1, 6).toFloat();
+      temperatura2 = datos.substring(6, 11).toFloat();
+      temperatura3 = datos.substring(11, 16).toFloat();
+      temperatura4 = datos.substring(16, 21).toFloat();
+
+      Serial.println("Temperaturas:");
+      Serial.println(temperatura1);
+      Serial.println(temperatura2);
+      Serial.println(temperatura3);
+      Serial.println(temperatura4);
+
+       
+  int x = ThingSpeak.writeField(myChannelNumber, 1, temperatura1, myWriteAPIKey);
+  delay(15000);
+  int y = ThingSpeak.writeField(myChannelNumber, 2, temperatura2, myWriteAPIKey);
+  delay(15000);
+  int z = ThingSpeak.writeField(myChannelNumber, 3, temperatura3, myWriteAPIKey);
+  delay(15000);
+  int w = ThingSpeak.writeField(myChannelNumber, 4, temperatura4, myWriteAPIKey);
+  delay(15000);
+
+
+  if(x == 200){
+    Serial.println("Informacion actualizada en el canal");
+  }
+  else{
+    Serial.println("Problema actualizando el canal, error HTTP:  " + String(x));
+  }
+
+  if(y == 200){
+    Serial.println("Informacion actualizada en el canal");
+  }
+  else{
+    Serial.println("Problema actualizando el canal, error HTTP:  " + String(y));
+  }
+
+  if(z == 200){
+    Serial.println("Informacion actualizada en el canal");
+  }
+  else{
+    Serial.println("Problema actualizando el canal, error HTTP:  " + String(z));
+  }
+
+  if(w == 200){
+    Serial.println("Informacion actualizada en el canal");
+  }
+  else{
+    Serial.println("Problema actualizando el canal, error HTTP:  " + String(w));
+  }
+    }
+  }
+}
